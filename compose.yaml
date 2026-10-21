@@ -1,0 +1,13 @@
+services:
+  career-agent:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file: .env
+    volumes:
+      - career_data:/data
+    environment:
+      DATABASE_PATH: /data/career_agent.sqlite3
+    restart: unless-stopped
+volumes:
+  career_data:
