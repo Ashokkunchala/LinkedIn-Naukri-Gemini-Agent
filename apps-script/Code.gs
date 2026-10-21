@@ -22,7 +22,7 @@ function setupCareerAgent() {
   getOrCreateLabel_(CONFIG.inputLabel);
   getOrCreateLabel_(CONFIG.processedLabel);
   ScriptApp.getProjectTriggers()
-    .filter(t => t.getHandlerFunction() === 'processJobAlerts')
+    .filter(t => ['processJobAlerts', 'processJobAlertsAdvanced'].indexOf(t.getHandlerFunction()) >= 0)
     .forEach(t => ScriptApp.deleteTrigger(t));
   initializeCareerTracker();
   ScriptApp.newTrigger('processJobAlertsAdvanced').timeBased().everyMinutes(5).create();
