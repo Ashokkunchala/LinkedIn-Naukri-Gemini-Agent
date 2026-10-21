@@ -9,8 +9,8 @@ Recommended for a personal no-local-setup workflow. The code runs on Google's in
 4. Copy `apps-script/Code.gs` from this repository into the editor.
 5. In Project Settings, enable the `appsscript.json` manifest editor if you want to use the included manifest.
 6. Add these Script Properties separately (never commit secrets): `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `ALERT_EMAIL`, `CANDIDATE_PROFILE`.
-7. Run `testConnections`, authorize the requested scopes, and confirm test messages arrive in Telegram and email.
-8. Run `setupCareerAgent` to create the five-minute trigger. Check the Apps Script Executions page and test a real labelled job-alert email before relying on it.
+6. Run `testConnections`, authorize the requested permissions, and confirm test messages arrive in Telegram and email.
+7. Run `setupCareerAgent` to create the five-minute trigger. Check the Apps Script Executions page and test a real labelled job-alert email before relying on it.
 
 ## Cost and limits
 Apps Script avoids a separate hosting subscription for ordinary personal use, but Google quotas apply and can change: https://developers.google.com/apps-script/guides/services/quotas. Five-minute triggers are supported: https://developers.google.com/apps-script/reference/script/clock-trigger-builder. Gemini free-tier availability and limits vary by model and account: https://ai.google.dev/gemini-api/docs/pricing. Telegram bot messaging is normally free.
