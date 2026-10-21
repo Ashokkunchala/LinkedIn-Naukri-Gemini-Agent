@@ -1,3 +1,9 @@
+## Advanced free-first hosted automation
+
+The Google Apps Script implementation now includes a persistent Google Sheets job tracker, score and skill-gap fields, duplicate suppression, per-channel notification state, transient Gemini retry/backoff, and human-reviewed cover-note/resume-tailoring drafts. It only reads authorized job-alert emails and never submits applications or changes LinkedIn/Naukri accounts. See [deployment guide](docs/GOOGLE_APPS_SCRIPT_SETUP.md) and [automation source](apps-script/Code.gs).
+
+**Not active until deployed:** create the Apps Script project, add secrets in Script Properties, authorize access, run connection tests, create the trigger, and verify a successful execution.
+
 # LinkedIn-Naukri-Gemini-Agent
 
 A Gemini-powered personal career copilot for LinkedIn and Naukri. It scores manually collected job descriptions, drafts truthful application materials, tracks applications, and records approvals before sensitive actions.
