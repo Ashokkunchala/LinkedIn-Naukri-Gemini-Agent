@@ -1,14 +1,24 @@
 import json
 import logging
-from fastapi import FastAPI, Header, HTTPException, Depends
+
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import HTMLResponse
-from .config import APP_API_KEY, MONITOR_INTERVAL_SECONDS, ALERT_MODE, MONITOR_ENABLED
-from .db import connect, init_db, audit
-from .schemas import JobCreate, DraftRequest, MatchRequest, ApprovalCreate, ApprovalDecision, ApplicationCreate
+
+from .config import ALERT_MODE, APP_API_KEY, MONITOR_ENABLED, MONITOR_INTERVAL_SECONDS
+from .db import audit, connect, init_db
+from .gemini import GeminiNotConfigured, generate_draft, match_job
+from .schemas import (
+    ApplicationCreate,
+    ApprovalCreate,
+    ApprovalDecision,
+    DraftRequest,
+    JobCreate,
+    MatchRequest,
+)
 from .scoring import score_job
-from .gemini import generate_draft, match_job, GeminiNotConfigured
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 app = FastAPI(title="LinkedIn-Naukri-Gemini-Agent", version="0.1.0",
               description="Approval-gated career copilot; external actions are disabled.")
 
@@ -16,7 +26,7 @@ app = FastAPI(title="LinkedIn-Naukri-Gemini-Agent", version="0.1.0",
 def startup():
     init_db()
     if not APP_API_KEY:
-        logging.warning("APP_API_KEY is unset. Configure it before using outside local development.")
+        logger.warning("APP_API_KEY is unset. Configure it before using outside local development.")
 
 def require_key(x_api_key: str | None = Header(default=None)):
     if APP_API_KEY and x_api_key != APP_API_KEY:
@@ -81,7 +91,7 @@ def match(job_id: int, request: MatchRequest):
     except GeminiNotConfigured as e:
         raise HTTPException(503, str(e))
     except Exception:
-        logging.exception("Gemini job matching failed")
+        logger.exception("Gemini job matching failed")
         raise HTTPException(502, "Gemini matching failed; check configuration and logs")
     with connect() as c:
         c.execute("UPDATE jobs SET fit_score=? WHERE id=?", (result["fit_score"], job_id))
