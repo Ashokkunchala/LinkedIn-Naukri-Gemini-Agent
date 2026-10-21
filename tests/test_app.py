@@ -1,14 +1,15 @@
+# ruff: noqa: E402
 import os
 import tempfile
 
-tmp = tempfile.NamedTemporaryFile(suffix=".sqlite3", delete=False)
-tmp.close()
-os.environ["DATABASE_PATH"] = tmp.name
+with tempfile.NamedTemporaryFile(suffix=".sqlite3", delete=False) as tmp:
+    database_path = tmp.name
+os.environ["DATABASE_PATH"] = database_path
 os.environ["APP_API_KEY"] = "test-key"
 
-from fastapi.testclient import TestClient  # noqa: E402
-from career_agent.main import app  # noqa: E402
-from career_agent.db import init_db  # noqa: E402
+from fastapi.testclient import TestClient
+from career_agent.db import init_db
+from career_agent.main import app
 
 init_db()  # TestClient isn't used as a context manager, so initialize the isolated test DB explicitly.
 client = TestClient(app)
