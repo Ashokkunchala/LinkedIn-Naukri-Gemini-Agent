@@ -1,5 +1,7 @@
 import json
+
 from google import genai
+
 from .config import GEMINI_API_KEY, GEMINI_MODEL
 
 class GeminiNotConfigured(RuntimeError):
@@ -58,7 +60,7 @@ CANDIDATE PROFILE:
         gaps = result.get("gaps", [])
         rationale = str(result.get("rationale", ""))
         if not isinstance(strengths, list) or not isinstance(gaps, list):
-            raise ValueError("strengths and gaps must be lists")
+            raise TypeError("strengths and gaps must be lists")
         return {"fit_score": score, "strengths": [str(x) for x in strengths[:10]],
                 "gaps": [str(x) for x in gaps[:10]], "rationale": rationale[:4000],
                 "provider": "gemini", "requires_human_review": True}
