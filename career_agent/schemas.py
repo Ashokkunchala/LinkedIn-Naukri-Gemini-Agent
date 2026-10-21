@@ -15,6 +15,9 @@ class DraftRequest(BaseModel):
     profile: str = Field(min_length=5, max_length=20000)
     extra_instructions: str = Field(default="", max_length=4000)
 
+class MatchRequest(BaseModel):
+    profile: str = Field(min_length=5, max_length=20000)
+
 class ApprovalCreate(BaseModel):
     action_type: Literal["submit_application", "edit_profile", "send_message", "other"]
     target: str = Field(min_length=1, max_length=2000)
