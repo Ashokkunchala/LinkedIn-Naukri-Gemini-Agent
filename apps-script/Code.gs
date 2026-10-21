@@ -103,41 +103,7 @@ function extractJobsWithGemini_(source, subject, sender, body) {
     'Source: ' + source + '\nSender: ' + sender + '\nSubject: ' + subject,
     'Email body:\n' + String(body).slice(0, 18000)
   ].join('\n\n');
-  const response = UrlFetchApp.fetch(CONFIG.geminiEndpoint + CONFIG.model + ':generateContent', {
-    method: 'post', contentType: 'application/json',
-    headers: { 'x-goog-api-key': props.getProperty('GEMINI_API_KEY') },
-    payload: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: 'OBJECT',
-          properties: {
-            is_job_alert: { type: 'BOOLEAN' },
-            jobs: { type: 'ARRAY', items: {
-              type: 'OBJECT',
-              properties: {
-                title: { type: 'STRING' }, company: { type: 'STRING' }, location: { type: 'STRING' },
-                url: { type: 'STRING' }, fit_score: { type: 'INTEGER' },
-                matched_skills: { type: 'ARRAY', items: { type: 'STRING' } },
-                gaps: { type: 'ARRAY', items: { type: 'STRING' } }, summary: { type: 'STRING' }
-              },
-              required: ['title', 'company', 'location', 'url', 'fit_score', 'matched_skills', 'gaps', 'summary']
-            } }
-          },
-          required: ['is_job_alert', 'jobs']
-        }
-      }
-    }),
-    muteHttpExceptions: true
-  });
-  if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
-    throw new Error('Gemini API error (' + response.getResponseCode() + '): ' + response.getContentText().slice(0, 500));
-  }
-  const envelope = JSON.parse(response.getContentText());
-  const text = (envelope.candidates && envelope.candidates[0] && envelope.candidates[0].content && envelope.candidates[0].content.parts || [])
-    .map(p => p.text || '').join('');
-  if (!text) throw new Error('Gemini returned no text.');
+  const text = geminiPlainRequest_(prompt, true);
   const parsed = JSON.parse(text);
   return parsed.is_job_alert && Array.isArray(parsed.jobs) ? parsed.jobs : [];
 }
