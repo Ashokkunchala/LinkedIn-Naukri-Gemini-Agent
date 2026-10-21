@@ -46,6 +46,7 @@ The interval has a 300-second minimum. **Do not set `MONITOR_ENABLED=true` expec
 - `GET /api/monitor/status`
 - `GET /api/jobs`
 - `POST /api/jobs`
+- `POST /api/jobs/{id}/match` — Gemini fit score, strengths, gaps, and rationale
 - `POST /api/jobs/{id}/draft`
 - `GET /api/approvals`
 - `POST /api/approvals`
