@@ -63,6 +63,10 @@ curl -X POST http://127.0.0.1:8000/api/jobs \
   -d '{"platform":"manual","title":"Platform Engineer","company":"Example","description":"Kubernetes, AWS, Terraform, Python","skills":["Kubernetes","AWS","Terraform"]}'
 ```
 
+## No-local-setup automation (n8n Cloud)
+
+An importable, inactive workflow is available at [`n8n/workflows/linkedin-naukri-gemini-alerts.json`](n8n/workflows/linkedin-naukri-gemini-alerts.json). Follow [`docs/N8N_CLOUD_SETUP.md`](docs/N8N_CLOUD_SETUP.md) to connect Gmail, Gemini, Telegram, set your candidate profile, and test before activation. The workflow processes authorized job-alert emails, scores jobs with Gemini, and alerts via Telegram and email. It does not apply or modify accounts. Monitoring is not active until you deploy and verify it in your n8n Cloud workspace.
+
 ## Platform access, rate limits, and fallback
 
 See [Platform Integration Policy](docs/PLATFORM_INTEGRATIONS.md) for documented access constraints, rate-limit behavior, and authorized integration requirements. LinkedIn API limits depend on the application and endpoint; do not assume candidate job-search access. This project has not verified a public general-purpose Naukri candidate-search API or universal quota. Never scrape pages, use undocumented endpoints, reuse session cookies, or bypass platform controls.
