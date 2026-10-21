@@ -6,9 +6,11 @@ tmp.close()
 os.environ["DATABASE_PATH"] = tmp.name
 os.environ["APP_API_KEY"] = "test-key"
 
-from fastapi.testclient import TestClient
-from career_agent.main import app
+from fastapi.testclient import TestClient  # noqa: E402
+from career_agent.main import app  # noqa: E402
+from career_agent.db import init_db  # noqa: E402
 
+init_db()  # TestClient isn't used as a context manager, so initialize the isolated test DB explicitly.
 client = TestClient(app)
 H = {"X-API-Key": "test-key"}
 
