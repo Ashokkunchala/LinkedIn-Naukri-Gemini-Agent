@@ -4,9 +4,9 @@ from fastapi import FastAPI, Header, HTTPException, Depends
 from fastapi.responses import HTMLResponse
 from .config import APP_API_KEY, MONITOR_INTERVAL_SECONDS, ALERT_MODE, MONITOR_ENABLED
 from .db import connect, init_db, audit
-from .schemas import JobCreate, DraftRequest, ApprovalCreate, ApprovalDecision, ApplicationCreate
+from .schemas import JobCreate, DraftRequest, MatchRequest, ApprovalCreate, ApprovalDecision, ApplicationCreate
 from .scoring import score_job
-from .gemini import generate_draft, GeminiNotConfigured
+from .gemini import generate_draft, match_job, GeminiNotConfigured
 
 logging.basicConfig(level=logging.INFO)
 app = FastAPI(title="LinkedIn-Naukri-Gemini-Agent", version="0.1.0",
@@ -68,6 +68,24 @@ def add_job(j: JobCreate):
         jid = cur.lastrowid
     audit("job_added", json.dumps({"job_id": jid, "platform": j.platform, "matches": matches}))
     return {"id": jid, "fit_score": score, "matched_skills": matches}
+
+@app.post("/api/jobs/{job_id}/match", dependencies=[Depends(require_key)])
+def match(job_id: int, request: MatchRequest):
+    with connect() as c:
+        row = c.execute("SELECT * FROM jobs WHERE id=?", (job_id,)).fetchone()
+    if not row:
+        raise HTTPException(404, "Job not found")
+    try:
+        result = match_job(dict(row), request.profile)
+    except GeminiNotConfigured as e:
+        raise HTTPException(503, str(e))
+    except Exception:
+        logging.exception("Gemini job matching failed")
+        raise HTTPException(502, "Gemini matching failed; check configuration and logs")
+    with connect() as c:
+        c.execute("UPDATE jobs SET fit_score=? WHERE id=?", (result["fit_score"], job_id))
+    audit("gemini_job_matched", json.dumps({"job_id": job_id, "fit_score": result["fit_score"]}))
+    return result
 
 @app.post("/api/jobs/{job_id}/draft", dependencies=[Depends(require_key)])
 def draft(job_id: int, d: DraftRequest):
